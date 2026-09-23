@@ -806,18 +806,5 @@ Authorization: Bearer <YOUR_JWT_TOKEN>
 
 ---
 
-# 📝 Practical 8 Conclusion
-
-Practical 8 successfully implemented **route-based lazy loading and code splitting** in the React frontend.
-
-Using `React.lazy()` and `Suspense`, route-specific components are loaded dynamically when required. Vite generates separate JavaScript chunks for lazy-loaded routes, while the Suspense fallback provides a meaningful loading interface.
-
-Chrome Developer Tools were used to inspect JavaScript requests, observe lazy-loaded chunks, and compare performance before and after optimization.
-
-The implementation demonstrates how code splitting can reduce the amount of JavaScript required during the initial page load and improve the perceived loading experience of a React application.
-
----
-
-# 📄 License
-
+## 📄 License
 This project is open-source and intended for educational purposes.
