@@ -15,6 +15,9 @@ const eventRoutes = require("./routes/eventRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const authRoutes = require("./routes/authRoutes");
 
+// Register EventEmitter listeners
+require("./listeners");
+
 // 2. Load environment variables from .env file
 dotenv.config();
 
