@@ -1,691 +1,215 @@
-# 📅 Event & Task Management System (MERN Stack) — Practical 6, 7 & 8
+# Event Management System
 
-A complete, modular full-stack application built with **React (Vite), Node.js, Express, MongoDB (Mongoose), and JWT Authentication** for the **Advanced Web Development Frameworks (AWDF)** practical syllabus.
+A full-stack web application developed as part of **Advanced Web Development Frameworks (ITUE301)**. The project covers React component architecture, RESTful API development, MongoDB integration, authentication, performance optimization, asynchronous processing, and containerization using Docker.
 
-> **✅ Status: Practical 6, 7 & 8 Performed & Verified**
->
-> * **Practical 6:** Full-stack CRUD operations and MERN architecture
-> * **Practical 7:** JWT Authentication, Protected Routes, Input Validation, User Model, Login/Register, and Logout
-> * **Practical 8:** React Performance Optimization using `React.lazy()`, `Suspense`, and route-based code splitting
+## Project Overview
 
----
+The Event Management System provides a platform to manage events, organize event information, and allow users to interact with event listings. The application follows a full-stack architecture with React on the frontend, Node.js and Express on the backend, and MongoDB as the database.
 
-## 📑 Table of Contents
+The project is developed incrementally across 11 weeks of practical work, with each week introducing and integrating new web development concepts.
 
-* [Practical 8 Performed Overview](#-practical-8-performed-overview)
-* [Practical 7 Performed Overview](#-practical-7-performed-overview)
-* [Practical 6 Performed Overview](#-practical-6-performed-overview)
-* [Tech Stack](#-tech-stack)
-* [Project Architecture & Auth Pipeline](#-project-architecture--auth-pipeline)
-* [Performance Optimization Architecture](#-performance-optimization-architecture)
-* [Folder Structure](#-folder-structure)
-* [Practical Syllabus Mapping](#-practical-syllabus-mapping)
-* [Getting Started](#-getting-started)
+## Objectives
 
-  * [Prerequisites](#prerequisites)
-  * [1. Backend Setup](#1-backend-setup)
-  * [2. Frontend Setup](#2-frontend-setup)
-* [Performance Testing](#-performance-testing)
-* [Before & After Comparison](#-before--after-comparison)
-* [API Endpoints Reference](#-api-endpoints-reference)
-* [Testing Authentication Endpoints](#-testing-authentication-endpoints)
-* [License](#-license)
+- Build a responsive and component-based React frontend.
+- Implement RESTful APIs using Node.js and Express.
+- Store and manage event information using MongoDB and Mongoose.
+- Integrate the frontend and backend through HTTP APIs.
+- Implement authentication and middleware.
+- Optimize frontend rendering and database queries.
+- Explore in-memory caching and event-driven asynchronous processing.
+- Containerize the application using Docker and Docker Compose.
 
----
+## Technology Stack
 
-# ⚡ Practical 8 Performed Overview
+| Technology | Purpose |
+|---|---|
+| React | Frontend user interface |
+| React Router | Client-side routing |
+| Node.js | Backend JavaScript runtime |
+| Express.js | REST API and middleware |
+| MongoDB | Database for event information |
+| Mongoose | MongoDB schema design and data modeling |
+| JWT / Authentication | User authentication, if implemented |
+| Node.js Events / Async Processing | Event-driven processing, if implemented |
+| Docker | Application containerization |
+| Docker Compose | Multi-container orchestration |
+| Git and GitHub | Version control and repository hosting |
 
-## Performance Optimization and Lazy Loading in React
+## Main Features
 
-In **Practical 8**, the React frontend was optimized using **route-based lazy loading and code splitting**.
+The intended application features include:
 
-The objective was to reduce the amount of JavaScript required during the initial page load and load route-specific components only when the user visits the corresponding route.
+- Event listing and event detail views.
+- Create, view, update, and delete events.
+- Event information such as title, description, date, time, venue, and category.
+- Navigation between application pages.
+- Backend REST API integration.
+- MongoDB persistence.
+- User authentication and protected routes, if implemented.
+- Performance improvements through lazy loading and query optimization.
+- Containerized frontend, backend, and database services.
 
-### Technologies Used
+*Note: Features should be marked as completed only when they have been implemented and tested in the application.*
 
-* React `lazy()`
-* React `Suspense`
-* Dynamic `import()`
-* Vite code splitting
-* Chrome Developer Tools
-* Network tab
-* Network throttling using Slow 3G
-
----
-
-## 🚀 Lazy Loading Implementation
-
-The route components are loaded dynamically using `React.lazy()`.
-
-Example:
-
-```jsx
-const Home = lazy(() => import("./pages/Home"));
-const Events = lazy(() => import("./pages/Events"));
-const EventDetails = lazy(() => import("./pages/EventDetails"));
-const About = lazy(() => import("./pages/About"));
-const Contact = lazy(() => import("./pages/Contact"));
-```
-
-Admin pages are also lazy-loaded:
-
-```jsx
-const AdminDashboard = lazy(() =>
-  import("./pages/admin/AdminDashboard")
-);
-
-const ManageEvents = lazy(() =>
-  import("./pages/admin/ManageEvents")
-);
-```
-
-This allows Vite to create separate JavaScript chunks for these pages.
-
----
-
-## ⏳ Suspense Fallback
-
-`Suspense` is used to display a loading message while the required lazy-loaded component is being downloaded.
-
-```jsx
-<Suspense fallback={<LoadingPage />}>
-  <Routes>
-    <Route path="/" element={<Home />} />
-    <Route path="/events" element={<Events />} />
-    <Route path="/events/:id" element={<EventDetails />} />
-    <Route path="/about" element={<About />} />
-    <Route path="/contact" element={<Contact />} />
-  </Routes>
-</Suspense>
-```
-
-The application displays:
+## Project Structure
 
 ```text
-Loading page...
-```
-
-while the required JavaScript chunk is loading.
-
----
-
-## 📦 Lazy-Loaded Routes
-
-The following route components were converted to lazy-loaded components:
-
-| Route           | Component      | Lazy Loaded |
-| :-------------- | :------------- | :---------: |
-| `/`             | Home           |      ✅      |
-| `/events`       | Events         |      ✅      |
-| `/events/:id`   | EventDetails   |      ✅      |
-| `/about`        | About          |      ✅      |
-| `/contact`      | Contact        |      ✅      |
-| `/admin`        | AdminDashboard |      ✅      |
-| `/admin/events` | ManageEvents   |      ✅      |
-| `*`             | NotFound       |      ✅      |
-
-The authentication component remains normally imported because it is a shared authentication component:
-
-```jsx
-import Auth from "./components/Auth";
-```
-
----
-
-# 🏗 Performance Optimization Architecture
-
-### Before Optimization
-
-All route components were statically imported:
-
-```text
-                    React Application
-                           |
-                           ▼
-                     Main Bundle
-                           |
-          ┌────────────────┼────────────────┐
-          ▼                ▼                ▼
-        Home            Events           Contact
-          |                |                |
-          └────────────────┴────────────────┘
-                   Loaded initially
-```
-
-This can result in more JavaScript being required during the initial application load.
-
----
-
-### After Optimization
-
-Route components are dynamically imported:
-
-```text
-                    React Application
-                           |
-                           ▼
-                     Main Bundle
-                           |
-                           ▼
-                     Initial Page
-                           |
-                ┌──────────┴──────────┐
-                │                     │
-             /events              /contact
-                │                     │
-                ▼                     ▼
-         Events Chunk          Contact Chunk
-```
-
-Only the JavaScript required for the current route is loaded initially. Other route chunks can be requested when their routes are visited.
-
----
-
-# 🔍 How Lazy Loading Works
-
-The application uses:
-
-```jsx
-lazy(() => import("./pages/Events"))
-```
-
-instead of:
-
-```jsx
-import Events from "./pages/Events";
-```
-
-When the user visits `/events`, the browser requests the corresponding JavaScript chunk.
-
-Conceptually:
-
-```text
-User opens /
-      ↓
-Initial JavaScript loaded
-      ↓
-User clicks Events
-      ↓
-Events chunk requested
-      ↓
-Suspense displays loading UI
-      ↓
-Events component loaded
-      ↓
-Events page displayed
-```
-
----
-
-# 🧪 Performance Testing
-
-Performance was tested using **Chrome Developer Tools**.
-
-## 1. Build the application
-
-Run:
-
-```bash
-npm run build
-```
-
-The Vite build output is used to compare the generated JavaScript bundles before and after optimization.
-
----
-
-## 2. Open Chrome DevTools
-
-Open the application and press:
-
-```text
-Ctrl + Shift + I
-```
-
-Open:
-
-```text
-Network
-```
-
-Then select:
-
-```text
-JS
-```
-
-Enable:
-
-```text
-Disable cache
-```
-
-Reload the application.
-
----
-
-## 3. Test Lazy Loading
-
-Use the Network throttling option:
-
-```text
-Slow 3G
-```
-
-Then reload the application.
-
-Visit:
-
-```text
-/events
-```
-
-A separate JavaScript chunk for the Events page should be requested.
-
-Similarly, visit:
-
-```text
-/contact
-```
-
-and observe the Contact JavaScript chunk.
-
----
-
-## 4. Expected Network Behavior
-
-Initial page:
-
-```text
-Initial JavaScript
-      ↓
-Home page
-```
-
-After navigating to Events:
-
-```text
-Initial JavaScript
-      +
-Events chunk
-```
-
-After navigating to Contact:
-
-```text
-Initial JavaScript
-      +
-Contact chunk
-```
-
-The exact generated chunk filenames depend on the Vite build.
-
----
-
-# 📊 Before & After Comparison
-
-Performance measurements should be recorded using the actual values obtained from the application and Chrome Developer Tools.
-
-| Metric                 | Before Optimization | After Optimization |
-| :--------------------- | :-----------------: | :----------------: |
-| Initial JS Bundle      |   `[Enter value]`   |   `[Enter value]`  |
-| Initial JS Transferred |   `[Enter value]`   |   `[Enter value]`  |
-| Initial Load Time      |   `[Enter value]`   |   `[Enter value]`  |
-| Route Chunks           |   `[Enter value]`   |   `[Enter value]`  |
-| Projects/Events Chunk  |    Not separated    |   Separate chunk   |
-| Contact Chunk          |    Not separated    |   Separate chunk   |
-
-> **Note:** Replace the `[Enter value]` fields with the actual measurements obtained during the practical.
-
----
-
-# 📸 Practical 8 Evidence
-
-The following screenshots should be included in the repository or a `docs`/`screenshots` folder.
-
-Recommended files:
-
-```text
-screenshots/
-├── before-build.png
-├── before-network.png
-├── after-build.png
-├── events-chunk.png
-└── contact-chunk.png
-```
-
-### Screenshot 1 — Before Build
-
-Shows the output of:
-
-```bash
-npm run build
-```
-
-before lazy loading was implemented.
-
-### Screenshot 2 — Before Network
-
-Chrome DevTools Network tab showing the initial JavaScript loading before optimization.
-
-### Screenshot 3 — After Build
-
-Shows the Vite build output after implementing lazy loading and code splitting.
-
-### Screenshot 4 — Events Chunk
-
-Chrome DevTools Network tab showing the Events JavaScript chunk being requested when `/events` is visited.
-
-### Screenshot 5 — Contact Chunk
-
-Chrome DevTools Network tab showing the Contact JavaScript chunk being requested when `/contact` is visited.
-
----
-
-# 🧠 Key Concepts
-
-### What is Lazy Loading?
-
-Lazy loading means loading a component only when it is required instead of loading all application components at the beginning.
-
-### What is Code Splitting?
-
-Code splitting divides a large JavaScript bundle into smaller chunks that can be loaded independently.
-
-### Why use `React.lazy()`?
-
-`React.lazy()` allows React components to be loaded dynamically using JavaScript dynamic imports.
-
-### Why use `Suspense`?
-
-`Suspense` provides a fallback UI while a lazy-loaded component is being downloaded.
-
-### Does lazy loading reduce total JavaScript?
-
-Lazy loading primarily reduces the JavaScript required during the **initial load**. Other chunks can be downloaded later when their corresponding routes are visited.
-
-### When may lazy loading not be useful?
-
-For a very small application with a small JavaScript bundle, lazy loading may add complexity without providing a significant performance benefit.
-
----
-
-# 🔐 Practical 7 Performed Overview
-
-In **Practical 7**, end-to-end security, user management, and authentication layers were implemented across backend and frontend:
-
-## Backend Implementation
-
-1. **User Model & Schema (`backend/models/User.js`)**
-
-   * `email` (String, required, unique, trimmed)
-   * `password` (String, hashed with `bcryptjs` salt rounds = 10)
-   * `timestamps` (`createdAt`, `updatedAt`)
-
-2. **Authentication Routes (`authRoutes.js`)**
-
-   * `POST /api/auth/register` — Validates input, hashes password, saves user
-   * `POST /api/auth/login` — Verifies password hash and issues signed JWT token
-   * `GET /api/auth/me` — Protected endpoint returning logged-in user profile
-
-3. **Authentication Middleware (`authMiddleware.js`)**
-
-   * Extracts `Bearer <token>` from the `Authorization` header
-   * Verifies JWT using `process.env.JWT_SECRET`
-   * Attaches decoded user information to `req.user`
-   * Rejects unauthorized requests with `401 Unauthorized`
-
-4. **Validation Middleware (`validateTask.js`)**
-
-   * Validates mandatory fields before processing requests
-
-5. **Protected Route Pipeline**
-
-```text
-Client Request
-      ↓
-authMiddleware
-      ↓
-JWT Check
-      ↓
-validateTask
-      ↓
-Controller / Database
-```
-
-## Frontend Implementation
-
-1. **Auth Component (`Auth.jsx`)**
-
-   * Login and Registration forms
-   * Stores issued token in `localStorage`
-   * Displays error/success messages
-
-2. **Central API Client (`api.js`)**
-
-   * Attaches Bearer token to protected requests
-   * Handles `401 Unauthorized` responses
-
-3. **Navbar and Logout**
-
-   * Displays Logout when authenticated
-   * Displays Login when unauthenticated
-
-4. **Routing**
-
-   * `/login`
-   * `/auth`
-
----
-
-# 📅 Practical 6 Performed Overview
-
-In **Practical 6**, the generic full-stack template was adapted into an **Event Management System**:
-
-* **Backend Model (`Event.js`)**: `title`, `description`, `eventDate`, `location`, `category`, `status`, `createdAt`
-* **Backend REST API (`eventRoutes.js`)**: Full CRUD operations
-* **Frontend Components**:
-
-  * `EventCard.jsx`
-  * `EventForm.jsx`
-  * `Events.jsx`
-  * `EventDetails.jsx`
-  * `ManageEvents.jsx`
-  * `AdminDashboard.jsx`
-* Multi-page routing using React Router DOM
-* MongoDB persistence using Mongoose
-
----
-
-# 🛠 Tech Stack
-
-## Frontend
-
-* **React (Vite)** — Fast functional UI components and state management
-* **React Router DOM** — Client-side routing
-* **React.lazy()** — Lazy loading of route components
-* **React Suspense** — Loading fallback for lazy components
-* **Dynamic `import()`** — Route-based code splitting
-* **Fetch API** — Native asynchronous HTTP client
-* **Pure CSS** — Responsive styling
-
-## Backend
-
-* **Node.js** — JavaScript runtime
-* **Express.js** — REST API framework
-* **MongoDB & Mongoose** — Database and ODM
-* **bcryptjs** — Password hashing
-* **jsonwebtoken (JWT)** — Token-based authentication
-* **dotenv** — Environment configuration
-* **cors** — Cross-Origin Resource Sharing
-
-## Development & Testing
-
-* **VS Code**
-* **Chrome Developer Tools**
-* **Network Tab**
-* **Performance Tab**
-* **Vite Build Tool**
-* **Slow 3G Network Throttling**
-
----
-
-# 🏛 Project Architecture & Auth Pipeline
-
-```text
-┌────────────────────────────────────────────────────────┐
-│               1. Presentation Layer                    │
-│             React Frontend (Vite)                      │
-│             http://localhost:5173                      │
-│                                                        │
-│  - User Interface, Pages & Admin Dashboard             │
-│  - React Router                                        │
-│  - Lazy Loading & Code Splitting                       │
-│  - Suspense Loading UI                                 │
-│  - Authentication                                      │
-└──────────────────────────┬─────────────────────────────┘
-                           │
-                           │ HTTP Requests
-                           │ Authorization: Bearer <JWT>
-                           ▼
-┌────────────────────────────────────────────────────────┐
-│                2. Application Layer                    │
-│               Express.js REST API                      │
-│             http://localhost:5000                      │
-│                                                        │
-│  - Authentication Routes                               │
-│  - JWT Middleware                                      │
-│  - Validation Middleware                               │
-│  - Events & Tasks REST APIs                            │
-└──────────────────────────┬─────────────────────────────┘
-                           │
-                           │ Mongoose Queries
-                           ▼
-┌────────────────────────────────────────────────────────┐
-│                  3. Data Layer                         │
-│                MongoDB Database                        │
-│             mongodb://127.0.0.1:27017                  │
-│                                                        │
-│  - users collection                                    │
-│  - events collection                                   │
-└────────────────────────────────────────────────────────┘
-```
-
----
-
-# 📂 Folder Structure
-
-```text
-PRA_6/
-├── backend/
-│   ├── middleware/
-│   │   ├── authMiddleware.js
-│   │   ├── errorHandler.js
-│   │   ├── logger.js
-│   │   └── validateTask.js
-│   ├── models/
-│   │   ├── Event.js
-│   │   └── User.js
-│   ├── routes/
-│   │   ├── authRoutes.js
-│   │   ├── eventRoutes.js
-│   │   └── taskRoutes.js
-│   ├── .env
-│   ├── .env.example
-│   ├── .gitignore
-│   ├── package.json
-│   └── server.js
-│
+event-management-system/
 ├── frontend/
+│   ├── public/
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── Auth.jsx
-│   │   │   ├── ErrorMessage.jsx
-│   │   │   ├── EventCard.jsx
-│   │   │   ├── EventForm.jsx
-│   │   │   ├── Footer.jsx
-│   │   │   ├── Header.jsx
-│   │   │   ├── Loading.jsx
-│   │   │   └── Navbar.jsx
 │   │   ├── pages/
-│   │   │   ├── admin/
-│   │   │   │   ├── AdminDashboard.jsx
-│   │   │   │   └── ManageEvents.jsx
-│   │   │   ├── About.jsx
-│   │   │   ├── Contact.jsx
-│   │   │   ├── EventDetails.jsx
-│   │   │   ├── Events.jsx
-│   │   │   ├── Home.jsx
-│   │   │   └── NotFound.jsx
-│   │   ├── api.js
+│   │   ├── services/
 │   │   ├── App.jsx
-│   │   ├── index.css
 │   │   └── main.jsx
-│   ├── index.html
 │   ├── package.json
-│   └── vite.config.js
-│
-├── screenshots/
-│   ├── before-build.png
-│   ├── before-network.png
-│   ├── after-build.png
-│   ├── events-chunk.png
-│   └── contact-chunk.png
-│
+│   ├── Dockerfile
+│   └── .dockerignore
+├── backend/
+│   ├── models/
+│   ├── routes/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── server.js
+│   ├── package.json
+│   ├── Dockerfile
+│   └── .dockerignore
+├── docker-compose.yml
+├── .gitignore
 └── README.md
 ```
 
----
+The directory structure is a recommended layout and can be adjusted to match the actual project.
 
-# 🎓 Practical Syllabus Mapping
+## Weekly Practical Implementation
 
-| Practical       | Covered Concepts                                                                                                                                    |
-| :-------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Practical 1** | React with Vite, Functional Components, Component Composition, Props, Reusable UI                                                                   |
-| **Practical 2** | React Router DOM, `BrowserRouter`, `Routes`, `Route`, `NavLink`, `useState`, Controlled Forms                                                       |
-| **Practical 3** | `useEffect`, Fetch API, Loading and Error States                                                                                                    |
-| **Practical 4** | Express Server, RESTful CRUD APIs, Logger and Error Handler Middleware                                                                              |
-| **Practical 5** | MongoDB, Mongoose Schemas, Validation and Database CRUD                                                                                             |
-| **Practical 6** | Full-stack MERN Integration, CORS, Database Persistence                                                                                             |
-| **Practical 7** | Authentication and Security, `bcryptjs`, JWT, Protected Routes, Middleware, User Model, Login/Register/Logout                                       |
-| **Practical 8** | **Performance Optimization, `React.lazy()`, `Suspense`, Dynamic Imports, Route-based Code Splitting, Vite Chunks, Chrome DevTools Network Testing** |
+### Week 1: Introduction to React and Component Architecture — CO1
 
----
+- Set up the React development environment.
+- Understand JSX and functional components.
+- Build reusable components for event cards, headers, navigation, and event details.
+- Organize the frontend using a component-based architecture.
 
-# 🚀 Getting Started
+### Week 2: State Management and Routing in React — CO1
 
-## Prerequisites
+- Manage event data and UI state using React hooks.
+- Use `useState` and `useEffect` where appropriate.
+- Implement page navigation using React Router.
+- Create routes for the event listing, event details, and event creation pages.
 
-* Node.js v18+
-* MongoDB running locally
-* npm
+### Week 3: API Integration and Data Rendering in React — CO1
 
-MongoDB:
+- Fetch event data from backend APIs.
+- Render event lists dynamically.
+- Handle loading states and API errors.
+- Integrate frontend forms with API requests.
 
-```text
-mongodb://127.0.0.1:27017
+### Week 4: Building a RESTful API with Node.js and Express — CO2
+
+- Set up the Node.js and Express backend.
+- Create REST endpoints for event management.
+- Implement CRUD operations.
+- Handle HTTP methods, status codes, request bodies, and errors.
+
+### Week 5: MongoDB Integration and Schema Design with Mongoose — CO2, CO3
+
+- Connect the backend to MongoDB.
+- Design Mongoose schemas for event records.
+- Validate event data.
+- Store, retrieve, update, and delete event information.
+
+### Week 6: Full Stack Integration — React + Node + MongoDB — CO1, CO2
+
+- Connect the React frontend to the Express API.
+- Integrate API endpoints with event forms and listing pages.
+- Verify that changes persist in MongoDB.
+- Test complete event management workflows.
+
+### Week 7: Authentication and Middleware Pipeline — CO2, CO6
+
+- Understand Express middleware.
+- Implement authentication if required by the application.
+- Validate incoming requests.
+- Protect restricted routes and handle authentication errors.
+
+### Week 8: Performance Optimization and Lazy Loading in React — CO1
+
+- Identify components that can be loaded lazily.
+- Use `React.lazy` and `Suspense` where appropriate.
+- Reduce unnecessary rendering.
+- Improve the initial loading experience.
+
+### Week 9: In-Memory Caching and Query Optimization — CO2, CO4
+
+- Explore caching frequently requested event data.
+- Optimize MongoDB queries.
+- Use suitable indexes for commonly queried fields.
+- Compare API performance before and after optimization.
+
+### Week 10: Asynchronous Processing with Event-Driven Architecture — CO4
+
+- Understand asynchronous processing in Node.js.
+- Explore event-driven communication and event listeners.
+- Separate selected background tasks from request handling.
+- Implement event notifications or background processing if included in the project.
+
+### Week 11: Containerization with Docker and Docker Compose — CO5
+
+- Create a Dockerfile for the React frontend.
+- Create a Dockerfile for the Node.js and Express backend.
+- Configure MongoDB using the official MongoDB image.
+- Define frontend, backend, and database services in `docker-compose.yml`.
+- Configure service networking, port mappings, and a named MongoDB volume.
+- Run the full application using a single Docker Compose command.
+
+## Installation and Setup
+
+### Prerequisites
+
+- Node.js and npm for local development.
+- MongoDB, locally or through a configured database service.
+- Git.
+- Docker Desktop or Docker Engine with Docker Compose for containerized execution.
+
+### Option 1: Run Locally
+
+**1. Clone the repository**
+
+```bash
+git clone https://github.com/24it022-kalpesh/AWDF_PRA_6.git
+cd event-management-system
 ```
 
----
-
-## 1. Backend Setup
+**2. Install backend dependencies**
 
 ```bash
 cd backend
 npm install
-npm run dev
 ```
 
-Ensure `backend/.env` contains:
+**3. Configure backend environment variables**
+
+Create a `.env` file in the backend directory with the variables required by your application. For example:
 
 ```env
 PORT=5000
-MONGO_URI=mongodb://127.0.0.1:27017/management_system_db
-JWT_SECRET=my_super_secret_key_12345
+MONGO_URI=mongodb://localhost:27017/eventdb
 ```
 
----
+Add other required variables, such as an authentication secret, if your application uses them. Never commit real secrets to GitHub.
 
-## 2. Frontend Setup
+**4. Start the backend**
+
+```bash
+npm start
+```
+
+Use `npm run dev` instead if your project defines a development script.
+
+**5. Install and start the frontend**
+
+Open another terminal:
 
 ```bash
 cd frontend
@@ -693,118 +217,106 @@ npm install
 npm run dev
 ```
 
-Open:
+For a Vite frontend, the application is commonly available at `http://localhost:5173`.
 
-```text
-http://localhost:5173
-```
+Ensure that the frontend API base URL matches the backend address and that the required CORS settings are configured.
 
----
+### Option 2: Run with Docker Compose
 
-# 📦 Production Build
+Ensure that the root `docker-compose.yml` defines the frontend, backend, and MongoDB services and that the backend uses the MongoDB Compose service name in its connection string.
 
-To generate the optimized production build:
+From the project root, run:
 
 ```bash
-npm run build
+docker compose up --build
 ```
 
-To preview the production build:
+Open the frontend at:
+
+`http://localhost:5173`
+
+The backend is available at:
+
+`http://localhost:5000`
+
+The exact endpoints depend on the routes implemented in the project.
+
+To check running services:
 
 ```bash
-npm run preview
+docker compose ps
 ```
 
-The Vite build output can be checked to verify that route-based JavaScript chunks have been generated.
+To view service logs:
 
----
-
-# 📡 API Endpoints Reference
-
-## 🔐 Authentication Endpoints
-
-| HTTP Method | Route                | Description                 | Headers / Auth                  |
-| :---------- | :------------------- | :-------------------------- | :------------------------------ |
-| **POST**    | `/api/auth/register` | Register new user           | None                            |
-| **POST**    | `/api/auth/login`    | Login and receive JWT       | None                            |
-| **GET**     | `/api/auth/me`       | Retrieve authenticated user | `Authorization: Bearer <token>` |
-
-## 📅 Events Endpoints
-
-| HTTP Method | Route             | Description           | Auth Required |
-| :---------- | :---------------- | :-------------------- | :------------ |
-| **GET**     | `/api/events`     | Retrieve all events   | No            |
-| **GET**     | `/api/events/:id` | Retrieve single event | No            |
-| **POST**    | `/api/events`     | Create a new event    | **Yes**       |
-| **PUT**     | `/api/events/:id` | Update event          | **Yes**       |
-| **DELETE**  | `/api/events/:id` | Delete event          | **Yes**       |
-
----
-
-# 🧪 Testing Authentication Endpoints
-
-## 1. Register a User
-
-**POST**
-
-```text
-http://localhost:5000/api/auth/register
+```bash
+docker compose logs
 ```
 
-Body:
+To stop the services:
 
-```json
-{
-  "email": "user@example.com",
-  "password": "password123"
-}
+```bash
+docker compose down
 ```
 
----
+A named MongoDB volume should be configured in Compose to preserve event data across normal container restarts and recreation. Avoid removing the volume when you need to retain database contents.
 
-## 2. Login
+## Example REST API Endpoints
 
-**POST**
+The following is a suggested API design. Adjust the endpoints to match the actual Express routes.
 
-```text
-http://localhost:5000/api/auth/login
-```
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/api/events` | Retrieve all events |
+| GET | `/api/events/:id` | Retrieve an event by ID |
+| POST | `/api/events` | Create a new event |
+| PUT | `/api/events/:id` | Update an event |
+| DELETE | `/api/events/:id` | Delete an event |
 
-Body:
+Authentication endpoints may also be added if user registration and login are implemented.
 
-```json
-{
-  "email": "user@example.com",
-  "password": "password123"
-}
-```
+## Testing and Verification
 
-Example response:
+Verify the following during development:
 
-```json
-{
-  "message": "Login successful",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-}
-```
+1. React pages and navigation work correctly.
+2. Event data is rendered from the API.
+3. The REST API returns appropriate responses.
+4. MongoDB stores and retrieves event records.
+5. Event creation, updating, and deletion work end-to-end.
+6. Authentication and authorization work if implemented.
+7. Loading states and errors are handled.
+8. Caching and database optimizations behave as intended.
+9. Docker Compose starts all required services.
+10. Event data persists after containers are stopped and recreated.
 
----
+## Learning Outcomes
 
-## 3. Access Protected Profile
+Upon completion, the project demonstrates the ability to:
 
-**GET**
+- Develop component-based React applications.
+- Manage frontend state and routing.
+- Build RESTful APIs with Express.
+- Design MongoDB schemas using Mongoose.
+- Integrate frontend, backend, and database services.
+- Understand middleware, authentication, and asynchronous processing.
+- Apply frontend and database performance optimizations.
+- Containerize and orchestrate a full-stack application with Docker Compose.
 
-```text
-http://localhost:5000/api/auth/me
-```
+## Course Information
 
-Header:
+- **Course:** Advanced Web Development Frameworks
+- **Course Code:** ITUE301
+- **Project:** Event Management System
+- **Practical Coverage:** Weeks 1–11
+- **Repository:** https://github.com/24it022-kalpesh/AWDF_PRA_6.git
 
-```text
-Authorization: Bearer <YOUR_JWT_TOKEN>
-```
+## Author
 
----
+**Student Name:** Kalpesh Gausvami 
+**Enrollment Number:** 24IT022
+**Department / Institution:** IT/ CSPIT
 
-## 📄 License
-This project is open-source and intended for educational purposes.
+## License
+
+This project was developed for academic and educational purposes.
