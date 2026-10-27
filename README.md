@@ -177,7 +177,7 @@ The directory structure is a recommended layout and can be adjusted to match the
 **1. Clone the repository**
 
 ```bash
-git clone https://github.com/24it022-kalpesh/AWDF_PRA_6.git
+git clone https://github.com/Smit-Makwana/AWDF_PRA_6.git
 cd event-management-system
 ```
 
@@ -309,14 +309,15 @@ Upon completion, the project demonstrates the ability to:
 - **Course Code:** ITUE301
 - **Project:** Event Management System
 - **Practical Coverage:** Weeks 1–11
-- **Repository:** https://github.com/24it022-kalpesh/AWDF_PRA_6.git
+- **Repository:** https://github.com/Smit-Makwana/AWDF_PRA_6.git
 
 ## Author
 
-**Student Name:** Kalpesh Gausvami 
-**Enrollment Number:** 24IT022
+**Student Name:** Smit Makwana 
+**Enrollment Number:** 24IT046
 **Department / Institution:** IT/ CSPIT
 
 ## License
 
 This project was developed for academic and educational purposes.
+
