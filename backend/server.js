@@ -26,14 +26,14 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/management_system_db";
 
-// 4. Connect to MongoDB Database
-
-mongoose.connect(
-  process.env.MONGO_URI || "mongodb://127.0.0.1:27017/management_system_db"
-)
-.then(() => console.log("MongoDB connected"))
-.catch((err) => console.error("MongoDB connection failed:", err));
-
+// 4. Connect to MongoDB Database (only if not in test environment)
+if (process.env.NODE_ENV !== "test") {
+  mongoose.connect(
+    process.env.MONGO_URI || "mongodb://127.0.0.1:27017/management_system_db"
+  )
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB connection failed:", err));
+}
 
 // 5. Built-in middleware to parse incoming JSON payloads
 app.use(express.json());
@@ -89,7 +89,12 @@ app.use((req, res, next) => {
 // 10. Register global error handling middleware (Must be registered last)
 app.use(errorHandler);
 
-// 11. Start Express Server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+// 11. Start Express Server (only when directly executed)
+let server;
+if (process.env.NODE_ENV !== "test") {
+  server = app.listen(PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;

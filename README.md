@@ -1,6 +1,8 @@
 # Event Management System
 
-A full-stack web application developed as part of **Advanced Web Development Frameworks (ITUE301)**. The project covers React component architecture, RESTful API development, MongoDB integration, authentication, performance optimization, asynchronous processing, and containerization using Docker.
+[![CI Pipeline](https://github.com/Smit-Makwana/24IT046-AWDF_PRA_6/actions/workflows/ci.yml/badge.svg)](https://github.com/Smit-Makwana/24IT046-AWDF_PRA_6/actions/workflows/ci.yml)
+
+A full-stack web application developed as part of **Advanced Web Development Frameworks (ITUE301)**. The project covers React component architecture, RESTful API development, MongoDB integration, authentication, performance optimization, asynchronous processing, containerization using Docker, and automated CI/CD pipelines with GitHub Actions.
 
 ## Project Overview
 
@@ -162,6 +164,33 @@ The directory structure is a recommended layout and can be adjusted to match the
 - Define frontend, backend, and database services in `docker-compose.yml`.
 - Configure service networking, port mappings, and a named MongoDB volume.
 - Run the full application using a single Docker Compose command.
+
+### Week 12: CI/CD Pipeline with GitHub Actions — CO5
+
+- Configured automated Continuous Integration pipeline via `.github/workflows/ci.yml`.
+- Triggered automatically on `push` and `pull_request` to the `main` branch.
+- Automated steps:
+  1. Code checkout (`actions/checkout@v4`).
+  2. Node.js environment configuration (`actions/setup-node@v4` with version 18 and npm caching).
+  3. Clean dependency installation (`npm ci`).
+  4. Automated API & route testing execution using Jest and Supertest (`npm test`).
+- Demonstrated both failed pipeline (via deliberate assertion failure) and passed pipeline (after resolution) with clear green/red status reporting.
+- Added live CI pipeline status badge to repository overview.
+
+#### Theory Analysis & Practical Questions
+
+1. **Difference between Continuous Integration (CI) and Continuous Deployment (CD):**
+   - **Continuous Integration (CI):** The practice of automating the integration of code changes from multiple developers into a single software project. It automatically triggers builds and runs automated test suites on every commit or pull request to detect bugs and integration issues early.
+   - **Continuous Deployment (CD):** The automated stage immediately following CI where validated changes are automatically released and deployed to a staging or production server/environment without human intervention.
+   - *This practical specifically demonstrates **Continuous Integration (CI)** (automated dependency resolution and unit/integration testing on push).*
+
+2. **Why running tests automatically on every push catches problems earlier:**
+   - Instead of discovering bugs days or weeks later during pre-release regression testing, CI alerts developers within minutes of committing flawed code.
+   - The culprit commit is isolated immediately, reducing the scope of troubleshooting.
+   - It prevents broken code from propagating to shared branches and impacting other team members.
+
+3. **What would happen if the test file path were incorrect?**
+   - Jest would scan the project for files matching test patterns (`*.test.js` or `*.spec.js`). If no tests are discovered (or if configured to fail when empty), the process exits with an error code, failing at the `npm test` step rather than at workflow checkout/install steps. However, the failure log would state "No tests found" instead of an assertion mismatch (`Expected: 200, Received: 500`).
 
 ## Installation and Setup
 
