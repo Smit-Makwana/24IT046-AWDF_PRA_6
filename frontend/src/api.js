@@ -152,3 +152,19 @@ export async function deleteEvent(id) {
 
   return response.json();
 }
+
+// GENERATE AI DESCRIPTION (Practical 13)
+export async function generateAiDescription(title, category) {
+  const response = await fetch(`${BASE_URL}/ai/generate-description`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title, category }),
+  });
+
+  const data = await response.json();
+  if (!response.ok && response.status !== 429) {
+    throw new Error(data.message || "Failed to generate AI description");
+  }
+  return data;
+}
+

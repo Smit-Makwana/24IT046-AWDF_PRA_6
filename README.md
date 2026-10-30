@@ -192,6 +192,37 @@ The directory structure is a recommended layout and can be adjusted to match the
 3. **What would happen if the test file path were incorrect?**
    - Jest would scan the project for files matching test patterns (`*.test.js` or `*.spec.js`). If no tests are discovered (or if configured to fail when empty), the process exits with an error code, failing at the `npm test` step rather than at workflow checkout/install steps. However, the failure log would state "No tests found" instead of an assertion mismatch (`Expected: 200, Received: 500`).
 
+### Week 13: AI API Integration into a Web Application — CO6
+
+- Integrated external AI service with OpenAI API (`gpt-4o-mini`) and Google Gemini API support.
+- Secure server-side architecture:
+  - API keys (`OPENAI_API_KEY` / `GEMINI_API_KEY`) remain strictly on the backend (`.env`), never exposed to frontend code or client network bundles.
+  - Express route: `POST /api/ai/generate-description`.
+- **Graceful Degradation:**
+  - If third-party AI keys are unconfigured, rate-limited, or remote requests time out, the backend intercepts the issue and delivers an intelligent contextual fallback description. The core application never crashes.
+- **Frontend User Experience:**
+  - Added "✨ Generate with AI" button on event creation and editing form.
+  - Interactive loading state ("⏳ Generating...").
+  - Result provided as an editable draft directly inside the description textarea.
+  - Status alert indicating whether output came from live AI or the offline graceful fallback.
+  - Explicit Responsible AI disclaimer: *"AI suggestions are editable drafts. Review and adapt content before saving."*
+- **Supplementary Enhancements:**
+  - Built-in per-client IP rate limiting (minimum 5s interval) to prevent request flooding and token exhaustion.
+
+#### Theory Analysis & Responsible AI Questions
+
+1. **Why must the AI API key be called from the backend rather than directly from the React frontend?**
+   - Frontend JavaScript runs directly inside the client's browser. Any API key in frontend code or environment variables (`VITE_*`) can be extracted from browser network requests, DevTools, or source bundles.
+   - Hosting the key in backend `.env` ensures keys are private, allows server-side request auditing and rate limiting, and prevents unauthorized external billing abuse.
+
+2. **What does "graceful degradation" mean in this context, and why does it matter?**
+   - Graceful degradation is the design practice where a system maintains core operational capabilities even when non-critical external third-party services fail or time out.
+   - For an event or task application, failing to contact an external AI service must never prevent an organizer from creating or editing an event manually. The app gracefully catches errors and falls back to template drafts or allows manual input.
+
+3. **Privacy and governance implications of sending task/event data to external AI APIs:**
+   - Any data sent to third-party AI providers may be logged, stored, or processed across remote servers.
+   - **Sensitive data that should NEVER be sent:** Personally Identifiable Information (PII) such as passwords, Aadhaar/Social Security numbers, credit card details, private health records, and proprietary organizational secrets. Always sanitize and anonymize prompts before transmission.
+
 ## Installation and Setup
 
 ### Prerequisites

@@ -14,6 +14,7 @@ const errorHandler = require("./middleware/errorHandler");
 const eventRoutes = require("./routes/eventRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const authRoutes = require("./routes/authRoutes");
+const aiRoutes = require("./routes/aiRoutes");
 
 // Register EventEmitter listeners
 require("./listeners");
@@ -77,6 +78,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/tasks", taskRoutes);
+app.use("/api/ai", aiRoutes);
 
 // 9. 404 Handler for undefined API routes
 app.use((req, res, next) => {
